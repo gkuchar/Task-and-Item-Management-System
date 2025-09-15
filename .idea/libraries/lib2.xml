@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="lib2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/__MACOSX/hogwarts-artifacts-management/javafx-sdk/lib/._javafx.base.jar!/" />
+      <root url="jar://$PROJECT_DIR$/__MACOSX/hogwarts-artifacts-management/javafx-sdk/lib/._javafx-swt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/__MACOSX/hogwarts-artifacts-management/javafx-sdk/lib/._jdk.jsobject.jar!/" />
+      <root url="jar://$PROJECT_DIR$/__MACOSX/hogwarts-artifacts-management/javafx-sdk/lib/._jfx.incubator.input.jar!/" />
+      <root url="jar://$PROJECT_DIR$/__MACOSX/hogwarts-artifacts-management/javafx-sdk/lib/._javafx.fxml.jar!/" />
+      <root url="jar://$PROJECT_DIR$/__MACOSX/hogwarts-artifacts-management/javafx-sdk/lib/._javafx.media.jar!/" />
+      <root url="jar://$PROJECT_DIR$/__MACOSX/hogwarts-artifacts-management/javafx-sdk/lib/._jfx.incubator.richtext.jar!/" />
+      <root url="jar://$PROJECT_DIR$/__MACOSX/hogwarts-artifacts-management/javafx-sdk/lib/._javafx.swing.jar!/" />
+      <root url="jar://$PROJECT_DIR$/__MACOSX/hogwarts-artifacts-management/javafx-sdk/lib/._javafx.web.jar!/" />
+      <root url="jar://$PROJECT_DIR$/__MACOSX/hogwarts-artifacts-management/javafx-sdk/lib/._javafx.graphics.jar!/" />
+      <root url="jar://$PROJECT_DIR$/__MACOSX/hogwarts-artifacts-management/javafx-sdk/lib/._javafx.controls.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
