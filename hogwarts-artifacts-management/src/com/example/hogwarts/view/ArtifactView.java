@@ -7,9 +7,12 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+
+import java.util.function.Predicate;
 
 public class ArtifactView extends VBox{
     private final ArtifactController controller;
@@ -23,7 +26,7 @@ public class ArtifactView extends VBox{
 
         setSpacing(10);
         setPadding(new Insets(10));
-        getChildren().addAll(createTable(), createButtons());
+        getChildren().addAll(createSearchBar(), createTable(), createButtons());
     }
 
     private TableView<Artifact> createTable() {
@@ -139,6 +142,37 @@ public class ArtifactView extends VBox{
         }
         return box;
     }
+
+    private HBox createSearchBar() {
+        Label label = new Label("Search By Artifact Name: ");
+        TextField search = new TextField();
+        search.setPrefWidth(250);
+        HBox box = new HBox(30);
+        box.getChildren().add(label);
+        box.getChildren().add(search);
+        search.setOnKeyReleased(e -> searchArtifacts(search.getText().toLowerCase()));
+        return box;
+    }
+
+    private void searchArtifacts(String searchString) {
+        if (searchString.isEmpty()) {
+            artifactTable.setItems(artifactData);
+            refreshArtifacts();
+            return;
+        }
+
+        FilteredList<Artifact> filteredData = new FilteredList<>(artifactData);
+
+        filteredData.setPredicate(item -> {
+            return item.getName().toLowerCase().contains(searchString);
+        });
+
+        artifactTable.setItems(filteredData);
+        refreshArtifacts();
+
+    }
+
+
 
     private void showAddArtifactDialog() {
         Dialog<Artifact> dialog = new Dialog<>();
