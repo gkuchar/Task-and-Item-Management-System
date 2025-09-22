@@ -2,6 +2,7 @@ package com.example.hogwarts.controller;
 
 import com.example.hogwarts.data.DataStore;
 import com.example.hogwarts.model.Artifact;
+import com.example.hogwarts.model.Wizard;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
@@ -26,6 +27,11 @@ public class ArtifactController {
         artifact.setName(newName);
         artifact.setDescription(newDesc);
     }
+
+    public boolean unassignArtifactFromWizard(Wizard wizard, Artifact artifact) {
+        return store.unassignArtifactFromWizard(wizard.getId(), artifact.getId());
+    }
+
 
     public void deleteArtifact(int id) {
         this.store.deleteArtifactById(id);

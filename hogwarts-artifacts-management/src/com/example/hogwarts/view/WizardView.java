@@ -66,6 +66,7 @@ public class WizardView extends VBox{
                         if (response == ButtonType.OK) {
                             controller.deleteWizard(wizard.getId());
                             wizardData.setAll(controller.findAllWizards());
+                            artifactView.refreshArtifacts();
                         }
                     });
                 });
@@ -118,6 +119,7 @@ public class WizardView extends VBox{
                 Wizard wizard = controller.addWizard(name);
                 wizardData.setAll(controller.findAllWizards());
                 wizardTable.getSelectionModel().select(wizard);
+                artifactView.refreshArtifacts();
             }
         });
     }
@@ -133,6 +135,7 @@ public class WizardView extends VBox{
             if (!name.isBlank()) {
                 controller.updateWizard(wizard.getId(), name);
                 wizardData.setAll(controller.findAllWizards());
+                artifactView.refreshArtifacts();
             }
         });
     }
@@ -152,12 +155,12 @@ public class WizardView extends VBox{
         dialog.setHeaderText("Assign to " + wizard.getName());
 
         dialog.showAndWait().ifPresent(artifact -> {
+            // artifact unassign doesnt work on artifacts after assigning them, only pre-assigned artifacts
             controller.assignArtifactToWizard(wizard, artifact);
             wizardData.setAll(controller.findAllWizards());
             wizardTable.getSelectionModel().select(wizard);
+            artifactView.refreshArtifacts();
         });
-
-        artifactView.refreshArtifacts();
     }
 
     private void showViewWizardDialog(Wizard wizard) {

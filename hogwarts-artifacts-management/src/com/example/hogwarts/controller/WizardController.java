@@ -33,7 +33,7 @@ public class WizardController {
     }
 
     public boolean assignArtifactToWizard(Wizard wizard, Artifact artifact) {
-        return this.store.assignArtifactToWizard(artifact.getId(), wizard.getId());
+        return this.store.assignArtifactToWizard(wizard.getId(), artifact.getId());
     }
 
     public List<Artifact> getUnassignedArtifacts() {
