@@ -116,7 +116,9 @@ public class ArtifactView extends VBox{
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Unassignment");
         confirm.setHeaderText("Unassign Artifact");
-        confirm.setContentText("Are you sure you want to unassign \"" + artifact.getName() + " from " + artifact.getOwner().getName() + "?");
+        String message = "Are you sure you want to unassign '" + artifact.getName() + "' from '" + artifact.getOwner().getName() + "'?";
+        confirm.setContentText(message);
+        confirm.getDialogPane().setPrefWidth(message.length() * 7);
 
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
