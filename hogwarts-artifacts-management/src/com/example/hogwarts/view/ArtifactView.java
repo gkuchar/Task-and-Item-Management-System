@@ -51,8 +51,8 @@ public class ArtifactView extends VBox{
             private final Button viewButton = new Button("View");
             private final Button editButton = new Button("Edit");
             private final Button deleteButton = new Button("Delete");
+            private final Button unassignButton = new Button("Unassign");
             private final HBox buttons = new HBox(5);
-
             {
                 viewButton.setOnAction(e -> {
                     Artifact artifact = getTableView().getItems().get(getIndex());
@@ -62,6 +62,12 @@ public class ArtifactView extends VBox{
                 editButton.setOnAction(e -> {
                     Artifact artifact = getTableView().getItems().get(getIndex());
                     showEditArtifactDialog(artifact);
+                });
+
+                unassignButton.setOnAction( e -> {
+                    Artifact artifact = getTableView().getItems().get(getIndex());
+                    unassignArtifactFromWizard(artifact);
+                    refreshArtifacts();
                 });
 
                 deleteButton.setOnAction(e -> {
@@ -74,7 +80,7 @@ public class ArtifactView extends VBox{
                     confirm.showAndWait().ifPresent(response -> {
                         if (response == ButtonType.OK) {
                             controller.deleteArtifact(artifact.getId());
-                            artifactData.setAll(controller.findAllArtifacts());
+                            refreshArtifacts();
                         }
                     });
                 });
@@ -86,10 +92,14 @@ public class ArtifactView extends VBox{
                 if (empty || getIndex() >= artifactData.size()) {
                     setGraphic(null);
                 } else {
+                    Artifact artifact = getTableView().getItems().get(getIndex());
                     buttons.getChildren().clear();
                     buttons.getChildren().add(viewButton);
                     if (DataStore.getInstance().getCurrentUser().isAdmin()) {
                         buttons.getChildren().addAll(editButton, deleteButton);
+                    }
+                    if(artifact.getOwner() != null) {
+                        buttons.getChildren().add(unassignButton);
                     }
                     setGraphic(buttons);
                 }
@@ -100,6 +110,22 @@ public class ArtifactView extends VBox{
         artifactTable.setItems(artifactData);
         artifactTable.setPrefHeight(300);
         return artifactTable;
+    }
+
+    private void unassignArtifactFromWizard(Artifact artifact) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirm Unassignment");
+        confirm.setHeaderText("Unassign Artifact");
+        confirm.setContentText("Are you sure you want to unassign \"" + artifact.getName() + " from " + artifact.getOwner().getName() + "?");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                controller.unassignArtifactFromWizard(artifact.getOwner(), artifact);
+                refreshArtifacts();
+            }
+        });
+
+
     }
 
     private HBox createButtons() {
@@ -128,7 +154,9 @@ public class ArtifactView extends VBox{
 
         dialog.setResultConverter(button -> {
             if (button == ButtonType.OK) {
-                return controller.addArtifact(nameField.getText(), descField.getText());
+                Artifact artifact = controller.addArtifact(nameField.getText(), descField.getText());
+                refreshArtifacts();
+                return artifact;
             }
             return null;
         });
@@ -158,7 +186,7 @@ public class ArtifactView extends VBox{
         dialog.setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 controller.updateArtifact(artifact.getId(), nameField.getText(), descField.getText());
-                artifactData.setAll(controller.findAllArtifacts());
+                refreshArtifacts();
             }
             return null;
         });

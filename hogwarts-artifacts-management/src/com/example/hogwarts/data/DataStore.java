@@ -102,12 +102,21 @@ public class DataStore {
         return this.artifacts.get(id);
     }
 
-    public boolean assignArtifactToWizard(int artifactId, int wizardId) {
+    public boolean assignArtifactToWizard(int wizardId, int artifactId) {
         Artifact artifact = this.artifacts.get(artifactId);
         Wizard wizard = this.wizards.get(wizardId);
         if (artifact == null || wizard == null) return false;
 
         wizard.addArtifact(artifact);
+        return true;
+    }
+
+    public boolean unassignArtifactFromWizard(int wizardId, int artifactId) {
+        Artifact artifact = this.artifacts.get(artifactId);
+        Wizard wizard = this.wizards.get(wizardId);
+        if (artifact == null || wizard == null) return false;
+
+        wizard.removeArtifact(artifact);
         return true;
     }
 
