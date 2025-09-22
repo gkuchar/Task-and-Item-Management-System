@@ -16,7 +16,7 @@ public class DashboardView extends BorderPane {
 
     public DashboardView() {
         this.artifactView = new ArtifactView();
-        this.wizardView = new WizardView();
+        this.wizardView = new WizardView(this.artifactView);
 
         setTop(createHeader());
         setLeft(createSidebar());

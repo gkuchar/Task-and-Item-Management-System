@@ -33,6 +33,19 @@ public class ArtifactView extends VBox{
         TableColumn<Artifact, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getName()));
 
+        TableColumn<Artifact, String> ownerCol = new TableColumn<>("Owner");
+        ownerCol.setCellValueFactory(cell ->  {
+            Artifact artifact = cell.getValue();
+            String ownerString;
+            if (artifact.getOwner() == null) {
+                ownerString = "--";
+            }
+            else {
+                ownerString = artifact.getOwner().getName();
+            }
+            return new ReadOnlyStringWrapper(ownerString);
+        });
+
         TableColumn<Artifact, Void> actionCol = new TableColumn<>("Actions");
         actionCol.setCellFactory(col -> new TableCell<>() {
             private final Button viewButton = new Button("View");
@@ -83,7 +96,7 @@ public class ArtifactView extends VBox{
             }
         });
 
-        artifactTable.getColumns().setAll(idCol, nameCol, actionCol);
+        artifactTable.getColumns().setAll(idCol, nameCol, actionCol, ownerCol);
         artifactTable.setItems(artifactData);
         artifactTable.setPrefHeight(300);
         return artifactTable;
@@ -176,5 +189,9 @@ public class ArtifactView extends VBox{
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
         dialog.showAndWait();
+    }
+
+    public void refreshArtifacts() {
+        artifactData.setAll(controller.findAllArtifacts());
     }
 }

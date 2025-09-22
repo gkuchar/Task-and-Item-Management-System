@@ -25,10 +25,12 @@ public class LoginController {
 
             Scene scene = this.loginView.getScene();
             if (scene != null) {
-                scene.setRoot(dashboardView); // Replace the login view with the dashboard view
-//                Stage stage = (Stage) scene.getWindow();
-//                stage.setWidth(800);
-//                stage.setHeight(600);
+                // Replace the login view with the dashboard view
+                Stage stage = (Stage) scene.getWindow();
+                Scene dashScene = new Scene(dashboardView, 600, 400);
+                stage.setScene(dashScene);
+                stage.show();
+
             }
         } else { // Authentication failed
             this.loginView.getMessageLabel().setText("Invalid username or password.");

@@ -16,11 +16,13 @@ public class WizardView extends VBox{
     private final WizardController controller;
     private final TableView<Wizard> wizardTable;
     private final ObservableList<Wizard> wizardData;
+    private final ArtifactView artifactView;
 
-    public WizardView() {
+    public WizardView(ArtifactView artifactView) {
         this.controller = new WizardController();
         this.wizardTable = new TableView<>();
         this.wizardData = FXCollections.observableArrayList(controller.findAllWizards());
+        this.artifactView = artifactView;
 
         setSpacing(10);
         setPadding(new Insets(10));
@@ -154,6 +156,8 @@ public class WizardView extends VBox{
             wizardData.setAll(controller.findAllWizards());
             wizardTable.getSelectionModel().select(wizard);
         });
+
+        artifactView.refreshArtifacts();
     }
 
     private void showViewWizardDialog(Wizard wizard) {
