@@ -2,10 +2,15 @@ package com.example.hogwarts.controller;
 
 import com.example.hogwarts.data.DataStore;
 import com.example.hogwarts.model.Artifact;
+import com.example.hogwarts.model.Transaction;
 import com.example.hogwarts.model.Wizard;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.NoSuchElementException;
+
+import static com.example.hogwarts.model.Transaction.Type.ASSIGN;
+import static com.example.hogwarts.model.Transaction.Type.UNASSIGN;
 
 public class ArtifactController {
     private final DataStore store = DataStore.getInstance();
@@ -29,7 +34,12 @@ public class ArtifactController {
     }
 
     public boolean unassignArtifactFromWizard(Wizard wizard, Artifact artifact) {
-        return store.unassignArtifactFromWizard(wizard.getId(), artifact.getId());
+        boolean success = store.unassignArtifactFromWizard(wizard.getId(), artifact.getId());
+        if (success) {
+            Transaction transaction = new Transaction(Transaction.Type.UNASSIGN, artifact, LocalDateTime.now(), null, wizard);
+            artifact.addTransaction(transaction);
+        }
+        return success;
     }
 
 
