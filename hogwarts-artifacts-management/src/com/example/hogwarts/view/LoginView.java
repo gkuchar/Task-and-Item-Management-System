@@ -39,6 +39,10 @@ public class LoginView extends VBox{
         this.controller = loginController;
     }
 
+    public LoginController getController() {
+        return this.controller;
+    }
+
     public TextField getUserField() {
         return userField;
     }

@@ -17,6 +17,8 @@ public class DashboardController {
     }
 
     public void handleLogout() {
+        this.loginView.getMessageLabel().setText("You have been logged out.");
+
         StackPane rootPane = (StackPane) this.dashboardView.getParent();
 
         // Clear the current user session
@@ -24,11 +26,12 @@ public class DashboardController {
         // Clear the form fields in the login view
         this.loginView.getUserField().clear();
         this.loginView.getPassField().clear();
+        LoginView newView = new LoginView();
+        LoginController newLoginController = new LoginController(newView);
 
         Scene scene = this.dashboardView.getScene();
         if (scene != null) {
-            scene.setRoot(this.loginView); // Replace the dashboard view with login view
+            scene.setRoot(newView); // Replace the dashboard view with login view
         }
-        this.loginView.getMessageLabel().setText("You have been logged out.");
     }
 }
