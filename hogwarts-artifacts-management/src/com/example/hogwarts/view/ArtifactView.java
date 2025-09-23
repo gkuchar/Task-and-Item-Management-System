@@ -3,6 +3,8 @@ package com.example.hogwarts.view;
 import com.example.hogwarts.controller.ArtifactController;
 import com.example.hogwarts.data.DataStore;
 import com.example.hogwarts.model.Artifact;
+import com.example.hogwarts.model.Transaction;
+import com.example.hogwarts.model.Wizard;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -11,7 +13,11 @@ import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import java.time.format.DateTimeFormatter;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class ArtifactView extends VBox{
@@ -55,11 +61,17 @@ public class ArtifactView extends VBox{
             private final Button editButton = new Button("Edit");
             private final Button deleteButton = new Button("Delete");
             private final Button unassignButton = new Button("Unassign");
+            private final Button historyButton = new Button("History");
             private final HBox buttons = new HBox(5);
             {
                 viewButton.setOnAction(e -> {
                     Artifact artifact = getTableView().getItems().get(getIndex());
                     showViewArtifactDialog(artifact);
+                });
+
+                historyButton.setOnAction(e -> {
+                    Artifact artifact = getTableView().getItems().get(getIndex());
+                    showHistoryArtifactDialog(artifact);
                 });
 
                 editButton.setOnAction(e -> {
@@ -98,11 +110,12 @@ public class ArtifactView extends VBox{
                     Artifact artifact = getTableView().getItems().get(getIndex());
                     buttons.getChildren().clear();
                     buttons.getChildren().add(viewButton);
+                    buttons.getChildren().add(historyButton);
                     if (DataStore.getInstance().getCurrentUser().isAdmin()) {
                         buttons.getChildren().addAll(editButton, deleteButton);
-                    }
-                    if(artifact.getOwner() != null) {
-                        buttons.getChildren().add(unassignButton);
+                        if(artifact.getOwner() != null) {
+                            buttons.getChildren().add(unassignButton);
+                        }
                     }
                     setGraphic(buttons);
                 }
@@ -253,6 +266,62 @@ public class ArtifactView extends VBox{
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
         dialog.showAndWait();
+    }
+
+    public void showHistoryArtifactDialog(Artifact artifact) {
+        if (artifact == null) return;
+        List<Transaction> copy = artifact.getHistory().reversed();
+        ObservableList<Transaction> historyData = FXCollections.observableArrayList(copy);
+        Dialog dialog = new Dialog();
+        dialog.setTitle("Artifact History");
+        dialog.setHeaderText("Assignment History of: " + artifact.getName());
+
+        TableView<Transaction> table = new TableView();
+
+        TableColumn<Transaction, String> timeStampCol = new TableColumn<>("Time Stamp");
+        timeStampCol.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getDateTimeString()));
+
+        TableColumn<Transaction, Transaction.Type> typeCol = new TableColumn<>("Type");
+        typeCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getType()));
+
+        TableColumn<Transaction, String> toWizardCol = new TableColumn<>("To Wizard");
+        toWizardCol.setCellValueFactory(cell ->  {
+            Transaction t = cell.getValue();
+            String wizString;
+            if (t.getToWizard() == null) {
+                wizString = "--";
+            }
+            else {
+                wizString = t.getToWizard().getName();
+            }
+            return new ReadOnlyStringWrapper(wizString);
+        });
+
+        TableColumn<Transaction, String> fromWizardCol = new TableColumn<>("From Wizard");
+        fromWizardCol.setCellValueFactory(cell ->  {
+            Transaction t = cell.getValue();
+            String wizString;
+            if (t.getFromWizard() == null) {
+                wizString = "--";
+            }
+            else {
+                wizString = t.getFromWizard().getName();
+            }
+            return new ReadOnlyStringWrapper(wizString);
+        });
+
+        table.getColumns().setAll(timeStampCol, typeCol, toWizardCol, fromWizardCol);
+        table.setItems(historyData);
+        table.setPrefHeight(300);
+        table.setPrefWidth(600);
+
+        HBox content = new HBox(table);
+        content.setPadding(new Insets(10));
+
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        dialog.showAndWait();
+
     }
 
     public void refreshArtifacts() {
