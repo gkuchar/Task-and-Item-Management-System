@@ -36,7 +36,7 @@ public class ArtifactController {
     public boolean unassignArtifactFromWizard(Wizard wizard, Artifact artifact) {
         boolean success = store.unassignArtifactFromWizard(wizard.getId(), artifact.getId());
         if (success) {
-            Transaction transaction = new Transaction(Transaction.Type.UNASSIGN, artifact, LocalDateTime.now(), null, wizard);
+            Transaction transaction = new Transaction("UNASSIGN", artifact, LocalDateTime.now(), null, wizard);
             artifact.addTransaction(transaction);
         }
         return success;
@@ -45,5 +45,24 @@ public class ArtifactController {
 
     public void deleteArtifact(int id) {
         this.store.deleteArtifactById(id);
+    }
+
+    public boolean repairArtifact(Artifact artifact, int amount) {
+        int total = artifact.getCondition() + amount;
+        boolean hitMax = (total >= 100);
+        String type = "REPAIR by " + amount;
+        if (hitMax) {
+            artifact.setCondition(100);
+            type = type + " (hit max)";
+        }
+        else {
+            artifact.setCondition(artifact.getCondition() + amount);
+        }
+
+        Transaction transaction = new Transaction(type, artifact, LocalDateTime.now(), null, null);
+        artifact.addTransaction(transaction);
+
+        return hitMax;
+
     }
 }

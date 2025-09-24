@@ -107,7 +107,12 @@ public class DataStore {
         Wizard wizard = this.wizards.get(wizardId);
         if (artifact == null || wizard == null) return false;
 
+        if (artifact.getCondition() < 10) {
+            return false;
+        }
+
         wizard.addArtifact(artifact);
+        artifact.setCondition(artifact.getCondition() - 5);
         return true;
     }
 

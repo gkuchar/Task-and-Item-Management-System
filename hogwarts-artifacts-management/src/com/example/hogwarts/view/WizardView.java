@@ -155,11 +155,19 @@ public class WizardView extends VBox{
         dialog.setHeaderText("Assign to " + wizard.getName());
 
         dialog.showAndWait().ifPresent(artifact -> {
-            // artifact unassign doesnt work on artifacts after assigning them, only pre-assigned artifacts
-            controller.assignArtifactToWizard(wizard, artifact);
-            wizardData.setAll(controller.findAllWizards());
-            wizardTable.getSelectionModel().select(wizard);
-            artifactView.refreshArtifacts();
+            boolean success = controller.assignArtifactToWizard(wizard, artifact);
+            if (success) {
+                wizardData.setAll(controller.findAllWizards());
+                wizardTable.getSelectionModel().select(wizard);
+                artifactView.refreshArtifacts();
+            }
+            else {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Error: Cannot Assign " + artifact.getName()
+                        + " to a Wizard. " + artifact.getName() + "'s condition is < 10");
+                alert.setHeaderText("Poor Condition");
+                alert.showAndWait();
+                return;
+            }
         });
     }
 

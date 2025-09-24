@@ -12,18 +12,28 @@ public class Artifact {
     private String description;
     private Wizard owner; // can be null
     private ArrayList<Transaction> history; // can be empty, but not null
+    private int condition;
 
     public Artifact(String name, String description) {
         this.name = Objects.requireNonNullElse(name, "name must not be null");
         this.description = Objects.requireNonNullElse(description, "description must not be null");
         this.owner = null;
         this.history = new ArrayList<>();
+        this.condition = 100;
     }
 
     public int getId() { return id; }
     public String getName() { return name; }
     public String getDescription() { return description; }
     public Wizard getOwner() { return owner; }
+
+    public int getCondition() {
+        return condition;
+    }
+
+    public void setCondition(int condition) {
+        this.condition = condition;
+    }
 
     public void setId(int id) { this.id = id; }
     public void setName(String name) {

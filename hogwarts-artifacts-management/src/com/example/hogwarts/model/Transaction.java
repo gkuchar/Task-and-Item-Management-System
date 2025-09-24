@@ -7,14 +7,14 @@ import java.time.format.DateTimeFormatter;
 
 public class Transaction {
 
-    public enum Type  { ASSIGN, UNASSIGN }
-    private Type type;
+    public enum Type  { ASSIGN, UNASSIGN, REPAIR }
+    private String type;
     private Wizard fromWizard;
     private Wizard toWizard;
     private Artifact artifact;
     private LocalDateTime timeStamp;
 
-    public Transaction(Type type, Artifact artifact, LocalDateTime timeStamp, Wizard toWizard, Wizard fromWizard) {
+    public Transaction(String type, Artifact artifact, LocalDateTime timeStamp, Wizard toWizard, Wizard fromWizard) {
         this.artifact = artifact;
         this.type = type;
         this.timeStamp = timeStamp;
@@ -31,11 +31,11 @@ public class Transaction {
 
     }
 
-    public Type getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(String type) {
         this.type = type;
     }
 

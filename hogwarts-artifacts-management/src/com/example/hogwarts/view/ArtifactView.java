@@ -42,6 +42,9 @@ public class ArtifactView extends VBox{
         TableColumn<Artifact, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getName()));
 
+        TableColumn<Artifact, Number> conditionCol = new TableColumn<>("Condition");
+        conditionCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getCondition()));
+
         TableColumn<Artifact, String> ownerCol = new TableColumn<>("Owner");
         ownerCol.setCellValueFactory(cell ->  {
             Artifact artifact = cell.getValue();
@@ -62,6 +65,7 @@ public class ArtifactView extends VBox{
             private final Button deleteButton = new Button("Delete");
             private final Button unassignButton = new Button("Unassign");
             private final Button historyButton = new Button("History");
+            private final Button repairButton = new Button("Repair");
             private final HBox buttons = new HBox(5);
             {
                 viewButton.setOnAction(e -> {
@@ -77,6 +81,12 @@ public class ArtifactView extends VBox{
                 editButton.setOnAction(e -> {
                     Artifact artifact = getTableView().getItems().get(getIndex());
                     showEditArtifactDialog(artifact);
+                });
+
+                repairButton.setOnAction(e -> {
+                    Artifact artifact = getTableView().getItems().get(getIndex());
+                    showRepairArtifactDialog(artifact);
+                    refreshArtifacts();
                 });
 
                 unassignButton.setOnAction( e -> {
@@ -112,7 +122,7 @@ public class ArtifactView extends VBox{
                     buttons.getChildren().add(viewButton);
                     buttons.getChildren().add(historyButton);
                     if (DataStore.getInstance().getCurrentUser().isAdmin()) {
-                        buttons.getChildren().addAll(editButton, deleteButton);
+                        buttons.getChildren().addAll(editButton, repairButton, deleteButton);
                         if(artifact.getOwner() != null) {
                             buttons.getChildren().add(unassignButton);
                         }
@@ -122,9 +132,11 @@ public class ArtifactView extends VBox{
             }
         });
 
-        artifactTable.getColumns().setAll(idCol, nameCol, actionCol, ownerCol);
+        artifactTable.getColumns().setAll(idCol, nameCol, conditionCol, actionCol, ownerCol);
         artifactTable.setItems(artifactData);
         artifactTable.setPrefHeight(300);
+        artifactTable.setPrefWidth(1000);
+
         return artifactTable;
     }
 
@@ -216,6 +228,77 @@ public class ArtifactView extends VBox{
         });
     }
 
+    private void showRepairArtifactDialog(Artifact artifact) {
+        if (artifact == null) return;
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Repair Artifact");
+        dialog.setHeaderText("Repair the condition of " + artifact.getName() + ": ");
+
+
+        int condition = artifact.getCondition();
+        Label label = new Label("Current condition for " + artifact.getName() + " is: " + condition);
+        Label label2 = new Label("Enter the amount to repair (increase) the condition by");
+        Label label3 = new Label("(It must be an integer 0 to 100, condition cannot exceed 100)");
+
+        TextField amount = new TextField();
+
+        Button button = new Button("Repair");
+
+        VBox content = new VBox(label, label2, label3, amount, button);
+        content.setPadding(new Insets(10));
+
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        button.setOnAction(e -> {
+            try {
+                if (Integer.parseInt(amount.getText()) >= 0 && Integer.parseInt(amount.getText()) <= 100) {
+                    boolean hitMax = controller.repairArtifact(artifact, Integer.parseInt(amount.getText()));
+                    repairConfirmation(artifact, Integer.parseInt(amount.getText()), dialog, hitMax);
+                    refreshArtifacts();
+                }
+                else {
+                    invalidRepairPopup();
+                }
+            } catch (NumberFormatException f) {
+                invalidRepairPopup();
+            }
+        });
+        dialog.showAndWait();
+
+
+
+
+    }
+
+    private void repairConfirmation(Artifact artifact, int amount, Dialog dialog, boolean hitMax) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Artifact Repaired");
+        confirm.setHeaderText("Artifact has been repaired");
+        String message = artifact.getName() + " was repaired by " + amount;
+        if (hitMax) { message = message + ", condition exceeded 100 and was reduced back to 100";}
+        confirm.setContentText(message);
+        confirm.getDialogPane().setPrefWidth(message.length() * 7);
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                confirm.close();
+                dialog.close();
+            }
+        });
+    }
+
+    private void invalidRepairPopup() {
+        Alert confirm = new Alert(Alert.AlertType.ERROR);
+        confirm.setTitle("Repair Error");
+        confirm.setHeaderText("Please Enter a valid repair number");
+        confirm.setContentText("Value must be an integer from 0 to 100");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.CLOSE) {
+            }
+        });
+    }
+
     private void showEditArtifactDialog(Artifact artifact) {
         if (artifact == null) return;
 
@@ -255,6 +338,7 @@ public class ArtifactView extends VBox{
                 "ID: " + artifact.getId() + "\n" +
                         "Name: " + artifact.getName() + "\n" +
                         "Description: " + artifact.getDescription() + "\n" +
+                        "Condition: " + artifact.getCondition() + "\n" +
                         "Owner: " + ownerName
         );
         details.setEditable(false);
@@ -281,8 +365,8 @@ public class ArtifactView extends VBox{
         TableColumn<Transaction, String> timeStampCol = new TableColumn<>("Time Stamp");
         timeStampCol.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getDateTimeString()));
 
-        TableColumn<Transaction, Transaction.Type> typeCol = new TableColumn<>("Type");
-        typeCol.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getType()));
+        TableColumn<Transaction, String> typeCol = new TableColumn<>("Type");
+        typeCol.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().getType()));
 
         TableColumn<Transaction, String> toWizardCol = new TableColumn<>("To Wizard");
         toWizardCol.setCellValueFactory(cell ->  {
