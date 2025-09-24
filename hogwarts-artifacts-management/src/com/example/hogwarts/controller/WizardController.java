@@ -39,7 +39,7 @@ public class WizardController {
     public boolean assignArtifactToWizard(Wizard wizard, Artifact artifact) {
         boolean success = this.store.assignArtifactToWizard(wizard.getId(), artifact.getId());
         if (success) {
-            Transaction transaction = new Transaction(Transaction.Type.ASSIGN, artifact, LocalDateTime.now(), wizard, null);
+            Transaction transaction = new Transaction("ASSIGN", artifact, LocalDateTime.now(), wizard, null);
             artifact.addTransaction(transaction);
         }
         return success;
