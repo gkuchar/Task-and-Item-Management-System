@@ -1,6 +1,7 @@
 package com.example.hogwarts;
 
 import com.example.hogwarts.controller.LoginController;
+import com.example.hogwarts.data.DataStore;
 import com.example.hogwarts.view.LoginView;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -21,5 +22,10 @@ public class HogwartsApplication extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public void stop() {
+        DataStore.getInstance().saveData();
     }
 }

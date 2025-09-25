@@ -1,15 +1,23 @@
 package com.example.hogwarts.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import javafx.collections.ObservableList;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+
 public class Artifact {
     private int id;
     private String name;
     private String description;
+
+
     private Wizard owner; // can be null
     private ArrayList<Transaction> history; // can be empty, but not null
     private int condition;
@@ -20,6 +28,10 @@ public class Artifact {
         this.owner = null;
         this.history = new ArrayList<>();
         this.condition = 100;
+    }
+
+    public Artifact() {
+
     }
 
     public int getId() { return id; }
@@ -34,6 +46,11 @@ public class Artifact {
     public void setCondition(int condition) {
         this.condition = condition;
     }
+
+    public void setHistory(ArrayList<Transaction> history) {
+        this.history = history != null ? history : new ArrayList<>();
+    }
+
 
     public void setId(int id) { this.id = id; }
     public void setName(String name) {

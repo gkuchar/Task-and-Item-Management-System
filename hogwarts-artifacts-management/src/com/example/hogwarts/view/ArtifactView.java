@@ -135,7 +135,8 @@ public class ArtifactView extends VBox{
         artifactTable.getColumns().setAll(idCol, nameCol, conditionCol, actionCol, ownerCol);
         artifactTable.setItems(artifactData);
         artifactTable.setPrefHeight(300);
-        artifactTable.setPrefWidth(1000);
+        actionCol.setPrefWidth(360);
+        ownerCol.setPrefWidth(150);
 
         return artifactTable;
     }

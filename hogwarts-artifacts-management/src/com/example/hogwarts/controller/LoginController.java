@@ -27,7 +27,7 @@ public class LoginController {
             if (scene != null) {
                 // Replace the login view with the dashboard view
                 Stage stage = (Stage) scene.getWindow();
-                Scene dashScene = new Scene(dashboardView, 800, 400);
+                Scene dashScene = new Scene(dashboardView, 1200, 400);
                 stage.setScene(dashScene);
                 stage.show();
 

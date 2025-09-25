@@ -4,8 +4,17 @@ import com.example.hogwarts.model.Artifact;
 import com.example.hogwarts.model.Wizard;
 import com.example.hogwarts.model.Role;
 import com.example.hogwarts.model.User;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
+
+import static java.util.Collections.max;
+
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 /**
  * TODO: Make this a thread-safe singleton
@@ -15,39 +24,120 @@ public class DataStore {
     private static DataStore instance; // Singleton instance
 
     private final List<User> users = new ArrayList<>();
-    private final Map<Integer, Wizard> wizards = new HashMap<>();
-    private final Map<Integer, Artifact> artifacts = new HashMap<>();
 
-    private int wizardIdCounter = 1; // Wizard ID generator
-    private int artifactIdCounter = 1; // Artifact ID generator
+    private Map<Integer, Wizard> wizards = new HashMap<>();
+    private Map<Integer, Artifact> artifacts = new HashMap<>();
+
+    private final ObjectMapper mapper = new ObjectMapper()
+            .findAndRegisterModules()
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    private int wizardIdCounter; // Wizard ID generator
+    private int artifactIdCounter; // Artifact ID generator
 
     private User currentUser; // Currently authenticated user
+
+    private final File wizardFile = new File("data/wizards.json");
+    private final File artifactFile = new File("data/artifacts.json");
+
+
 
     private DataStore() {
         // Hardcoded users
         this.users.add(new User("admin", "123", Role.ADMIN));
         this.users.add(new User("user", "123", Role.USER));
 
-        // Sample data
-        Wizard w1 = new Wizard("Harry Potter");
-        Wizard w2 = new Wizard("Hermione Granger");
-        this.addWizard(w1);
-        this.addWizard(w2);
 
+    }
+
+    public static DataStore getInstance() {
+
+        if (instance == null) {
+            instance = new DataStore();
+            instance.loadDataOrSeed();
+        }
+
+        return instance;
+    }
+
+    private void loadDataOrSeed() {
+        if (wizardFile.exists()) {
+            try {
+                wizards = mapper.readValue(wizardFile, new TypeReference<HashMap<Integer, Wizard>>() {});
+                if (wizards.isEmpty()) {
+                    wizardIdCounter = 1;
+                }
+                else {
+                    wizardIdCounter = max(wizards.keySet()) + 1;
+                }
+
+            } catch (IOException e) {
+                System.out.println("Error loading wizards.json");
+                loadDefaultWizards();
+            }
+        }
+        else {
+            loadDefaultWizards();
+        }
+
+        if (artifactFile.exists()) {
+            try {
+                artifacts = mapper.readValue(artifactFile, new TypeReference<HashMap<Integer, Artifact>>() {});
+                if (artifacts.isEmpty()) {
+                    artifactIdCounter = 1;
+                } else {
+                    artifactIdCounter = max(artifacts.keySet()) + 1;
+                }
+            } catch (IOException e) {
+                System.out.println("Error loading artifacts.json: " + e.getClass().getName() + " - " + e.getMessage());
+                e.printStackTrace();
+                loadDefaultArtifacts();
+            }
+        }
+        else {
+            loadDefaultArtifacts();
+        }
+
+        for (Wizard w : wizards.values()) {
+            List<Artifact> fixed = new ArrayList<>();
+            for (Artifact a : w.getArtifacts()) {
+                Artifact canonical = artifacts.get(a.getId());
+                if (canonical != null) {
+                    canonical.setOwner(w);     // make sure owner points to w
+                    fixed.add(canonical);      // replace with the canonical artifact instance
+                }
+            }
+            w.setArtifacts(fixed);             // reset to canonical objects
+        }
+
+
+    }
+
+    public void saveData() {
+        try {
+            File folder = new File("data");
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+            mapper.writerWithDefaultPrettyPrinter().writeValue(wizardFile, wizards);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(artifactFile, artifacts);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void loadDefaultArtifacts() {
         Artifact a1 = new Artifact("Invisibility Cloak", "A magical cloak that makes the wearer invisible.");
         Artifact a2 = new Artifact("Time-Turner", "A device used for time travel.");
         this.addArtifact(a1);
         this.addArtifact(a2);
-
-        this.assignArtifactToWizard(a1.getId(), w1.getId());
-        this.assignArtifactToWizard(a2.getId(), w2.getId());
     }
 
-    public static DataStore getInstance() {
-        if (instance == null) {
-            instance = new DataStore();
-        }
-        return instance;
+    private void loadDefaultWizards() {
+        Wizard w1 = new Wizard("Harry Potter");
+        Wizard w2 = new Wizard("Hermione Granger");
+        this.addWizard(w1);
+        this.addWizard(w2);
     }
 
     // User authentication

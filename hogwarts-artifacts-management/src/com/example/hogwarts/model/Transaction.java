@@ -1,5 +1,7 @@
 package com.example.hogwarts.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -7,10 +9,15 @@ import java.time.format.DateTimeFormatter;
 
 public class Transaction {
 
-    public enum Type  { ASSIGN, UNASSIGN, REPAIR }
     private String type;
+
+    @JsonIgnore
     private Wizard fromWizard;
+
+    @JsonIgnore
     private Wizard toWizard;
+
+    @JsonIgnore
     private Artifact artifact;
     private LocalDateTime timeStamp;
 
@@ -22,6 +29,11 @@ public class Transaction {
         this.fromWizard = fromWizard;
     }
 
+    public Transaction() {
+
+    }
+
+    @JsonIgnore
     public String getDateTimeString() {
         ZoneId zoneId = ZoneId.of("America/Chicago");
         ZonedDateTime zonedDateTime = this.timeStamp.atZone(zoneId);

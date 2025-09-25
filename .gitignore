@@ -1,2 +1,9 @@
 __MACOSX/
 out/
+data/
+
+*.iml
+.idea/
+*.log
+*.class
+

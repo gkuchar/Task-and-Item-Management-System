@@ -1,21 +1,44 @@
 package com.example.hogwarts.model;
+import com.fasterxml.jackson.annotation.*;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Wizard {
     private int id;
     private String name;
+
+    @JsonProperty("artifacts")
     private final List<Artifact> artifacts = new ArrayList<>();
 
     public Wizard(String name) {
         this.name = Objects.requireNonNull(name, "name"); // name must not be null
     }
 
+    public Wizard() {
+
+    }
+
+    @JsonProperty("artifacts")
+    public void setArtifacts(List<Artifact> artifacts) {
+        this.artifacts.clear();
+        if (artifacts != null) {
+            for (Artifact a : artifacts) {
+                addArtifact(a); // ensures back-references are in sync
+            }
+        }
+    }
+
     public int getId() { return id; }
     public String getName() { return name; }
+
+    @JsonProperty("artifacts")
     public List<Artifact> getArtifacts() {
         return Collections.unmodifiableList(artifacts); // good defensive programming: prevent external modification
     }

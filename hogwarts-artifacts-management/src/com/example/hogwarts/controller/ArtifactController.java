@@ -9,8 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 
-import static com.example.hogwarts.model.Transaction.Type.ASSIGN;
-import static com.example.hogwarts.model.Transaction.Type.UNASSIGN;
+
 
 public class ArtifactController {
     private final DataStore store = DataStore.getInstance();
@@ -36,7 +35,7 @@ public class ArtifactController {
     public boolean unassignArtifactFromWizard(Wizard wizard, Artifact artifact) {
         boolean success = store.unassignArtifactFromWizard(wizard.getId(), artifact.getId());
         if (success) {
-            Transaction transaction = new Transaction("UNASSIGN", artifact, LocalDateTime.now(), null, wizard);
+            Transaction transaction = new Transaction("UNASSIGN", artifact, LocalDateTime.now().withNano(0), null, wizard);
             artifact.addTransaction(transaction);
         }
         return success;
@@ -59,7 +58,7 @@ public class ArtifactController {
             artifact.setCondition(artifact.getCondition() + amount);
         }
 
-        Transaction transaction = new Transaction(type, artifact, LocalDateTime.now(), null, null);
+        Transaction transaction = new Transaction(type, artifact, LocalDateTime.now().withNano(0), null, null);
         artifact.addTransaction(transaction);
 
         return hitMax;

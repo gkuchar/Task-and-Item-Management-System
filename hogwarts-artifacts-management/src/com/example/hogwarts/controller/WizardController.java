@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.hogwarts.model.Transaction.Type.ASSIGN;
+
 
 public class WizardController {
     private final DataStore store = DataStore.getInstance();
@@ -39,7 +39,7 @@ public class WizardController {
     public boolean assignArtifactToWizard(Wizard wizard, Artifact artifact) {
         boolean success = this.store.assignArtifactToWizard(wizard.getId(), artifact.getId());
         if (success) {
-            Transaction transaction = new Transaction("ASSIGN", artifact, LocalDateTime.now(), wizard, null);
+            Transaction transaction = new Transaction("ASSIGN", artifact, LocalDateTime.now().withNano(0), wizard, null);
             artifact.addTransaction(transaction);
         }
         return success;
