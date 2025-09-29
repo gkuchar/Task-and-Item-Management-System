@@ -1,0 +1,37 @@
+package com.example.management.controller;
+
+import com.example.management.data.DataStore;
+import com.example.management.view.DashboardView;
+import com.example.management.view.LoginView;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+
+public class DashboardController {
+    private final DashboardView dashboardView;
+    private final LoginView loginView;
+
+    public DashboardController(DashboardView dashboardView, LoginView loginView) {
+        this.dashboardView = dashboardView;
+        this.loginView = loginView;
+        this.dashboardView.setController(this);
+    }
+
+    public void handleLogout() {
+        this.loginView.getMessageLabel().setText("You have been logged out.");
+
+        StackPane rootPane = (StackPane) this.dashboardView.getParent();
+
+        // Clear the current user session
+        DataStore.getInstance().setCurrentUser(null);
+        // Clear the form fields in the login view
+        this.loginView.getUserField().clear();
+        this.loginView.getPassField().clear();
+        LoginView newView = new LoginView();
+        LoginController newLoginController = new LoginController(newView);
+
+        Scene scene = this.dashboardView.getScene();
+        if (scene != null) {
+            scene.setRoot(newView); // Replace the dashboard view with login view
+        }
+    }
+}
